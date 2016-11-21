@@ -99,28 +99,28 @@ public class Publication implements Parcelable {
         }
     };
 
-    public static JSONObject getPublicationJson(Publication publication){
+    public JSONObject getPublicationJson(){
         /** creates a json objedt from the publication as to be sent to the server */
         JSONObject publicationJsonRoot = new JSONObject();
         JSONObject publicationJson = new JSONObject();
         try {
-            publicationJson.put(PUBLICATION_LATITUDE_KEY, publication.getLat());
-            publicationJson.put(PUBLICATION_LONGITUDE_KEY, publication.getLng());
-            publicationJson.put(PUBLICATION_STARTING_DATE_KEY, publication.getStartingDate());
-            publicationJson.put(PUBLICATION_ADDRESS_KEY, publication.getAddress());
-            publicationJson.put(PUBLICATION_ENDING_DATE_KEY, publication.getEndingDate());
-            publicationJson.put(PUBLICATION_CONTACT_INFO_KEY, publication.getContactInfo());
-            publicationJson.put(PUBLICATION_SUBTITLE_KEY, publication.getSubtitle());
-            publicationJson.put(PUBLICATION_TITLE_KEY, publication.getTitle());
-            publicationJson.put(PUBLICATION_TYPE_OF_COLLECTION_KEY, publication.getTypeOfCollecting()); // was +1
-            publicationJson.put(PUBLICATION_IS_ON_AIR_KEY, publication.isOnAir());
-            publicationJson.put(PUBLICATION_PHOTO_URL, publication.getPhotoURL());
-            publicationJson.put(PUBLICATION_PUBLISHER_UUID_KEY, publication.getActiveDeviceDevUUID());
-            publicationJson.put(PUBLICATION_JSON_SEND_PUBLISHER_USER_NAME_KEY, publication.getIdentityProviderUserName());
-            publicationJson.put(PUBLICATION_PUBLISHER_ID_KEY, publication.getPublisherID());
-            publicationJson.put(PUBLICATION_PRICE_KEY, publication.getPrice());
-            publicationJson.put(PUBLICATION_AUDIENCE_KEY, publication.getAudience());
-            publicationJson.put(PUBLICATION_PRICE_DESCRIPTION_KEY, publication.getPriceDescription());
+            publicationJson.put(PUBLICATION_LATITUDE_KEY, getLat());
+            publicationJson.put(PUBLICATION_LONGITUDE_KEY, getLng());
+            publicationJson.put(PUBLICATION_STARTING_DATE_KEY, getStartingDate());
+            publicationJson.put(PUBLICATION_ADDRESS_KEY, getAddress());
+            publicationJson.put(PUBLICATION_ENDING_DATE_KEY, getEndingDate());
+            publicationJson.put(PUBLICATION_CONTACT_INFO_KEY, getContactInfo());
+            publicationJson.put(PUBLICATION_SUBTITLE_KEY, getSubtitle());
+            publicationJson.put(PUBLICATION_TITLE_KEY, getTitle());
+            publicationJson.put(PUBLICATION_TYPE_OF_COLLECTION_KEY, getTypeOfCollecting()); // was +1
+            publicationJson.put(PUBLICATION_IS_ON_AIR_KEY, isOnAir());
+            publicationJson.put(PUBLICATION_PHOTO_URL, getPhotoURL());
+            publicationJson.put(PUBLICATION_PUBLISHER_UUID_KEY, getActiveDeviceDevUUID());
+            publicationJson.put(PUBLICATION_JSON_SEND_PUBLISHER_USER_NAME_KEY, getIdentityProviderUserName());
+            publicationJson.put(PUBLICATION_PUBLISHER_ID_KEY, getPublisherID());
+            publicationJson.put(PUBLICATION_PRICE_KEY, getPrice());
+            publicationJson.put(PUBLICATION_AUDIENCE_KEY, getAudience());
+            publicationJson.put(PUBLICATION_PRICE_DESCRIPTION_KEY, getPriceDescription());
 
             publicationJsonRoot.put(PUBLICATION_KEY,publicationJson);
         } catch (JSONException e) {

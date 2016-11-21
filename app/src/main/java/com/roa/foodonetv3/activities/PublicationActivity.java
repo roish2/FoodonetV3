@@ -12,7 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import com.roa.foodonetv3.R;
 import com.roa.foodonetv3.commonMethods.CommonMethods;
-import com.roa.foodonetv3.fragments.AddPublicationFragment;
+import com.roa.foodonetv3.fragments.AddEditPublicationFragment;
 import com.roa.foodonetv3.fragments.PublicationDetailFragment;
 import com.roa.foodonetv3.model.Publication;
 
@@ -67,14 +67,30 @@ public class PublicationActivity extends AppCompatActivity implements Navigation
     }
 
     private void openNewPublicationFrag(int type){
+        Publication publication;
+        Bundle bundle;
         switch (type){
             case MainDrawerActivity.OPEN_ADD_PUBLICATION:
-                fragmentManager.beginTransaction().add(R.id.container_publication, new AddPublicationFragment(), "addPublicationFrag").commit();
+                AddEditPublicationFragment addPublicationFragment = new AddEditPublicationFragment();
+                bundle = new Bundle();
+                bundle.putInt(AddEditPublicationFragment.TAG,AddEditPublicationFragment.TYPE_NEW_PUBLICATION);
+                addPublicationFragment.setArguments(bundle);
+                fragmentManager.beginTransaction().add(R.id.container_publication, addPublicationFragment, "addEditPublicationFrag").commit();
+//                fragmentManager.beginTransaction().add(R.id.container_publication, new AddEditPublicationFragment(), "addEditPublicationFrag").commit();
+                break;
+            case MainDrawerActivity.OPEN_EDIT_PUBLICATION:
+                publication = getIntent().getParcelableExtra(Publication.PUBLICATION_KEY);
+                AddEditPublicationFragment editPublicationFragment = new AddEditPublicationFragment();
+                bundle = new Bundle();
+                bundle.putInt(AddEditPublicationFragment.TAG,AddEditPublicationFragment.TYPE_EDIT_PUBLICATION);
+                bundle.putParcelable(Publication.PUBLICATION_KEY,publication);
+                editPublicationFragment.setArguments(bundle);
+                fragmentManager.beginTransaction().add(R.id.container_publication, editPublicationFragment, "addEditPublicationFrag").commit();
                 break;
             case MainDrawerActivity.OPEN_PUBLICATION_DETAIL:
-                Publication publication = getIntent().getParcelableExtra(Publication.PUBLICATION_KEY);
+                publication = getIntent().getParcelableExtra(Publication.PUBLICATION_KEY);
                 PublicationDetailFragment publicationDetailFragment = new PublicationDetailFragment();
-                Bundle bundle = new Bundle();
+                bundle = new Bundle();
                 bundle.putParcelable(Publication.PUBLICATION_KEY,publication);
                 publicationDetailFragment.setArguments(bundle);
                 fragmentManager.beginTransaction().add(R.id.container_publication, publicationDetailFragment, "publicationDetailFrag").commit();

@@ -61,7 +61,7 @@ public class PublicationsRecyclerAdapter extends RecyclerView.Adapter<Publicatio
         return publications.size();
     }
 
-    class PublicationHolder extends RecyclerView.ViewHolder implements TransferListener, View.OnClickListener {
+    class PublicationHolder extends RecyclerView.ViewHolder implements TransferListener, View.OnClickListener, View.OnLongClickListener {
         private Publication publication;
         private ImageView imagePublication,imagePublicationGroup;
         private TextView textPublicationTitle, textPublicationAddressDistance;
@@ -78,6 +78,7 @@ public class PublicationsRecyclerAdapter extends RecyclerView.Adapter<Publicatio
             textPublicationAddressDistance = (TextView) itemView.findViewById(R.id.textPublicationAddressDistance);
             publicationImageSize = (int)context.getResources().getDimension(R.dimen.image_size_68);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         private void bindPublication(Publication publication) {
@@ -152,6 +153,16 @@ public class PublicationsRecyclerAdapter extends RecyclerView.Adapter<Publicatio
             i.putExtra(MainDrawerActivity.ACTION_OPEN_PUBLICATION,MainDrawerActivity.OPEN_PUBLICATION_DETAIL);
             i.putExtra(Publication.PUBLICATION_KEY,publication);
             context.startActivity(i);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            // TODO: 19/11/2016 test method to edit
+            Intent i = new Intent(context, PublicationActivity.class);
+            i.putExtra(MainDrawerActivity.ACTION_OPEN_PUBLICATION,MainDrawerActivity.OPEN_EDIT_PUBLICATION);
+            i.putExtra(Publication.PUBLICATION_KEY,publication);
+            context.startActivity(i);
+            return true;
         }
     }
 }

@@ -1,40 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
+    <group
+        android:checkableBehavior="none"
+        android:id="@+id/drawer_top">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
+            android:id="@+id/nav_my_shares"
+            android:icon="@drawable/drawer_my_shares"
+            android:title="@string/drawer_my_shares"/>
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:id="@+id/nav_all_events"
+            android:icon="@drawable/drawer_all_events"
+            android:title="@string/drawer_all_events"/>
         <item
-            android:id="@+id/nav_map"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Map" />
+            android:id="@+id/nav_map_view"
+            android:icon="@drawable/drawer_map_view"
+            android:title="@string/drawer_map_view" />
         <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:id="@+id/nav_notifications"
+            android:icon="@drawable/drawer_notifications"
+            android:title="@string/drawer_notifications"/>
+        <item
+            android:id="@+id/nav_groups"
+            android:icon="@drawable/drawer_groups"
+            android:title="@string/drawer_groups" />
     </group>
 
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
-            <item
-                android:id="@+id/nav_signout"
-                android:icon="@drawable/common_google_signin_btn_icon_light"
-                android:title="Sign out" />
-        </menu>
-    </item>
-
+    <group
+        android:checkableBehavior="none"
+        android:id="@+id/drawer_bottom">
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/drawer_settings"
+            android:title="@string/drawer_settings" />
+        <item
+            android:id="@+id/nav_contact_us"
+            android:icon="@drawable/drawer_contact_us"
+            android:title="@string/drawer_contact_us" />
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/drawer_about"
+            android:title="@string/drawer_about" />
+    </group>
 </menu>

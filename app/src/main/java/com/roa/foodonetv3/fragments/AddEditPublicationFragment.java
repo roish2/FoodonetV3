@@ -17,32 +17,42 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseUser;
-import com.roa.foodonetv3.DatePickerDialog;
 import com.roa.foodonetv3.R;
 import com.roa.foodonetv3.activities.MainDrawerActivity;
 import com.roa.foodonetv3.commonMethods.CommonMethods;
 import com.roa.foodonetv3.model.Publication;
 import com.roa.foodonetv3.services.AddPublicationService;
 import com.squareup.picasso.Picasso;
-
 import java.io.File;
 import java.io.IOException;
 
-public class AddPublicationFragment extends Fragment implements View.OnClickListener,DatePickerDialog.EndDateDialogListener {
-    private static final String TAG = "AddPublicationFragment";
+public class AddEditPublicationFragment extends Fragment implements View.OnClickListener{
+    public static final String TAG = "AddEditPublicationFrag";
     private static final int INTENT_TAKE_PICTURE = 1;
-    private EditText editTextTitleAddPublication,editTextLocationAddPublication,editTextPriceAddPublication,editTextShareWithAddPublication,editTextDetailsAddPublication;
-    private TextView textEndDate;
+    private static final int REQUEST_PLACE_PICKER = 10;
+    public static final int TYPE_NEW_PUBLICATION = 1;
+    public static final int TYPE_EDIT_PUBLICATION = 2;
+    private EditText editTextTitleAddPublication,editTextPriceAddPublication,editTextShareWithAddPublication,editTextDetailsAddPublication;
+    private TextView textLocationAddPublication;
     private long endingDate;
     private String mCurrentPhotoPath;
     private ImageView imagePictureAddPublication;
+    private LatLng latlng;
+    private Publication publication;
+    private boolean isEdit;
 
 
     /**The TransferUtility is the primary class for managing transfer to S3*/
     private TransferUtility transferUtility;
 
-    public AddPublicationFragment() {
+    public AddEditPublicationFragment() {
         // Required empty public constructor
     }
 
@@ -53,27 +63,37 @@ public class AddPublicationFragment extends Fragment implements View.OnClickList
         transferUtility = CommonMethods.getTransferUtility(getContext());
         /** local image path that will be used for saving locally and uploading the file name to the server*/
         mCurrentPhotoPath = "";
+
+        isEdit = getArguments().getInt(TAG, TYPE_NEW_PUBLICATION) != TYPE_NEW_PUBLICATION;
+        if(isEdit){
+            /** if there's a publication in the intent - it is an edit of an existing publication */
+             if(savedInstanceState == null){
+                /** also check if there's a savedInstanceState, if there isn't - load the publication, if there is - load from savedInstanceState */
+                publication = getArguments().getParcelable(Publication.PUBLICATION_KEY);
+                 latlng = new LatLng(publication.getLat(),publication.getLng());
+             } else{
+                // TODO: 19/11/2016 add savedInstanceState reader
+             }
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_add_publication, container, false);
+        View v = inflater.inflate(R.layout.fragment_add_edit_publication, container, false);
 
         editTextTitleAddPublication = (EditText) v.findViewById(R.id.editTextTitleAddPublication);
-        editTextLocationAddPublication = (EditText) v.findViewById(R.id.editTextLocationAddPublication);
+        textLocationAddPublication = (TextView) v.findViewById(R.id.textLocationAddPublication);
+        textLocationAddPublication.setOnClickListener(this);
         editTextShareWithAddPublication = (EditText) v.findViewById(R.id.editTextShareWithAddPublication);
         editTextDetailsAddPublication = (EditText) v.findViewById(R.id.editTextDetailsAddPublication);
         editTextPriceAddPublication = (EditText) v.findViewById(R.id.editTextPriceAddPublication);
-        textEndDate = (TextView) v.findViewById(R.id.textEndDate);
-        textEndDate.setOnClickListener(this);
         v.findViewById(R.id.imageTakePictureAddPublication).setOnClickListener(this);
         imagePictureAddPublication = (ImageView) v.findViewById(R.id.imagePictureAddPublication);
 
         /** temporary button to add a test publication to the server */
         v.findViewById(R.id.buttonTestAdd).setOnClickListener(this);
-
         return v;
     }
 
@@ -88,6 +108,19 @@ public class AddPublicationFragment extends Fragment implements View.OnClickList
     //                .centerCrop()
                     .into(imagePictureAddPublication);
         }
+        if(isEdit){
+            loadPublicationIntoViews();
+        }
+    }
+
+    public void loadPublicationIntoViews(){
+        // TODO: 19/11/2016 test
+        editTextTitleAddPublication.setText(publication.getTitle());
+        textLocationAddPublication.setText(publication.getAddress());
+        editTextShareWithAddPublication.setText("currently not working");
+        editTextDetailsAddPublication.setText(publication.getSubtitle());
+        editTextPriceAddPublication.setText(String.valueOf(publication.getPrice()));
+
     }
 
     @Override
@@ -103,14 +136,35 @@ public class AddPublicationFragment extends Fragment implements View.OnClickList
                     Toast.makeText(getContext(), "no photo path", Toast.LENGTH_SHORT).show();
                 }
                 break;
-            case R.id.textEndDate:
-                /** starts the date picker dialog for the end date */
-                DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity());
-                datePickerDialog.show();
-                break;
             case R.id.imageTakePictureAddPublication:
                 /** starts the image taking intent through the default app*/
                 dispatchTakePictureIntent();
+                break;
+            case R.id.textLocationAddPublication:
+                /** start the google places autocomplete widget */
+                try {
+                    PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
+                    Intent intent = intentBuilder.build(getActivity());
+//                    Intent intent =
+//                            new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+//                                    .build(getActivity());
+                    // Start the Intent by requesting a result, identified by a request code.
+                    startActivityForResult(intent, REQUEST_PLACE_PICKER);
+
+                    // Hide the pick option in the UI to prevent users from starting the picker
+                    // multiple times.
+//                    showPickAction(false);
+
+                } catch (GooglePlayServicesRepairableException e) {
+                    GooglePlayServicesUtil
+                            .getErrorDialog(e.getConnectionStatusCode(), getActivity(), 0);
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    Toast.makeText(getActivity(), "Google Play Services is not available.",
+                            Toast.LENGTH_LONG)
+                            .show();
+                }
+
+                // END_INCLUDE(intent)
                 break;
         }
     }
@@ -161,6 +215,14 @@ public class AddPublicationFragment extends Fragment implements View.OnClickList
                         //                    imagePictureAddPublication.setImageBitmap(scaledBitmap);
                     }
                     break;
+                case REQUEST_PLACE_PICKER:
+                    /** a place was successfully received from the place autocomplete sdk, including the address, and latlng */
+                    final Place place = PlacePicker.getPlace(getContext(),data);
+                    final CharSequence address = place.getAddress();
+                    latlng = place.getLatLng();
+                    textLocationAddPublication.setText(address);
+                    Toast.makeText(getContext(), "latlng: "+place.getLatLng().toString(), Toast.LENGTH_SHORT).show();
+                        break;
             }
         }
     }
@@ -170,17 +232,23 @@ public class AddPublicationFragment extends Fragment implements View.OnClickList
         /** upload the publication to the foodonet server */
         FirebaseUser user = MainDrawerActivity.getFireBaseUser();
         String title = editTextTitleAddPublication.getText().toString();
-        String location = editTextLocationAddPublication.getText().toString();
+        String location = textLocationAddPublication.getText().toString();
         String priceS = editTextPriceAddPublication.getText().toString();
         String shareWith = editTextShareWithAddPublication.getText().toString();
         String details = editTextDetailsAddPublication.getText().toString();
         /** currently starting time is now */
         long startingDate = System.currentTimeMillis();
         if(endingDate == 0){
+            /** default ending date is 2 days after creation */
             endingDate = startingDate + 172800000;
         }
-        long localPublicationID = CommonMethods.getNewLocalPublicationID();
-        if(title.equals("") || location.equals("") || shareWith.equals("")){
+        long localPublicationID;
+        if(!isEdit){
+            localPublicationID = CommonMethods.getNewLocalPublicationID();
+        } else{
+            localPublicationID = publication.getId();
+        }
+        if(title.equals("") || location.equals("") || shareWith.equals("") || latlng == null){
             Toast.makeText(getContext(), R.string.post_please_enter_all_fields, Toast.LENGTH_SHORT).show();
         } else {
             double price;
@@ -195,12 +263,13 @@ public class AddPublicationFragment extends Fragment implements View.OnClickList
                     return;
                 }
             }
+
             // TODO: 08/11/2016 repair starting time and ending time. also currently some fields are hard coded for testing
-            Publication publication = new Publication(localPublicationID, -1, title, details, location, (short) 2, 32.0907185, 34.873032,
+            publication = new Publication(localPublicationID, -1, title, details, location, (short) 2, latlng.latitude, latlng.longitude,
                     String.valueOf(startingDate/1000), String.valueOf(endingDate/1000),
                     "0500000000", true, CommonMethods.getDeviceUUID(getContext()), CommonMethods.getFileNameFromPath(mCurrentPhotoPath), 16, 0, user.getDisplayName(), price, "");
             Intent i = new Intent(getContext(), AddPublicationService.class);
-            i.putExtra(Publication.PUBLICATION_KEY, Publication.getPublicationJson(publication).toString());
+            i.putExtra(Publication.PUBLICATION_KEY, publication.getPublicationJson().toString());
             i.putExtra(Publication.PUBLICATION_UNIQUE_ID_KEY, publication.getId());
             getContext().startService(i);
             getActivity().finish();
@@ -229,12 +298,5 @@ public class AddPublicationFragment extends Fragment implements View.OnClickList
          * -> set listeners to in progress transfers.
          */
         // observer.setTransferListener(new UploadListener());
-    }
-
-    @Override
-    public void onEndDatePicked(long endingDate, String date) {
-        // TODO: 09/11/2016 the ios server string for dates are totally different...
-        textEndDate.setText(date);
-        this.endingDate = endingDate;
     }
 }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -40,7 +41,8 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
     // TODO: 12/11/2016 move two constants to different class
     public static final String ACTION_OPEN_PUBLICATION = "action_open_publication";
     public static final int OPEN_ADD_PUBLICATION = 1;
-    public static final int OPEN_PUBLICATION_DETAIL = 2;
+    public static final int OPEN_EDIT_PUBLICATION = 2;
+    public static final int OPEN_PUBLICATION_DETAIL = 3;
 
     private ViewPager viewPager;
     private ViewHolderAdapter adapter;
@@ -82,9 +84,10 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         if (mFirebaseUser == null) {
             // Not signed in, launch the Sign In activity
-            startActivity(new Intent(this, SignInActivity.class));
-            finish();
-            return;
+            // TODO: 21/11/2016 removed the mandatory sign in here
+//            startActivity(new Intent(this, SignInActivity.class));
+//            finish();
+//            return;
         } else {
             mUsername = mFirebaseUser.getDisplayName();
             if (mFirebaseUser.getPhotoUrl() != null) {
@@ -159,12 +162,12 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
             case R.id.action_settings:
                 mFirebaseAuth.signOut();
                 Auth.GoogleSignInApi.signOut(mGoogleApiClient);
-                startActivity(new Intent(this, SignInActivity.class));
+//                startActivity(new Intent(this, SignInActivity.class));
+                Snackbar.make(viewPager,"Signed out successfully",Snackbar.LENGTH_SHORT).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

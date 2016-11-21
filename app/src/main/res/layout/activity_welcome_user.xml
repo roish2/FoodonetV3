@@ -37,13 +37,13 @@
     <EditText
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:inputType="phone"
         android:ems="10"
         android:layout_above="@+id/finishRegisterationButton"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="11dp"
-        android:id="@+id/editText"
-        android:hint="טלפון" />
+        android:id="@+id/userPhoneNumberTxt"
+        android:hint="טלפון"
+        android:inputType="number" />
 
     <TextView
         android:text="שלב אחרון להתחלה"

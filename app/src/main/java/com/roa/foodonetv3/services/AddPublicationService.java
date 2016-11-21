@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.util.Locale;
+
 import javax.net.ssl.HttpsURLConnection;
 
 public class AddPublicationService extends IntentService {
@@ -29,11 +31,20 @@ public class AddPublicationService extends IntentService {
 
             //todo use localID to later save the correct server id to the database
             long publicationLocalID = intent.getLongExtra(Publication.PUBLICATION_UNIQUE_ID_KEY,-1);
-
             HttpsURLConnection connection = null;
             BufferedReader reader = null;
             StringBuilder urlAddressBuilder = new StringBuilder(getResources().getString(R.string.foodonet_server));
-            urlAddressBuilder.append(getResources().getString(R.string.foodonet_publications));
+            if(publicationLocalID<0){
+                /** if the publication id is negative - it is a new publication to add */
+                urlAddressBuilder.append(getResources().getString(R.string.foodonet_publications));
+                urlAddressBuilder.append(getResources().getString(R.string._json));
+            } else{
+                /** if the publication id is positive - it is an edit of an existing publication */
+                urlAddressBuilder.append(getResources().getString(R.string.foodonet_publications));
+                urlAddressBuilder.append(String.format(Locale.US,"/%1$d",publicationLocalID));
+                urlAddressBuilder.append(getResources().getString(R.string._json));
+            }
+
             Log.d(TAG,"address: " + urlAddressBuilder.toString());
             try {
                 URL url = new URL(urlAddressBuilder.toString());
@@ -57,7 +68,7 @@ public class AddPublicationService extends IntentService {
                 while((line = reader.readLine())!= null){
                     builder.append(line);
                 }
-                //todo save the response server id to the database, replacing the local one
+                //todo save the response server id to the database, replacing the local one and / or update the version number of an edit
 
 
                 Log.d("SERVER RESPONSE", builder.toString());

@@ -7,7 +7,8 @@
     <string name="amazon_sub_path_user_images">foodonetusersdev</string>
     <string name="amazon_user_avatar_image_name">fduser{0}.jpg</string>
 
-    <string name="foodonet_publications">/publications.json</string>
+    <string name="foodonet_publications">/publications</string>
+    <string name=".json">.json</string>
     <string name="foodonet_user">/users</string>
 
     <string name="amazon_bucket">foodonet</string>
